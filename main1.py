@@ -9,30 +9,15 @@ x, y = spiral_data(samples=100, classes=3)
 plt.scatter(x[:, 0], x[:, 1], c=y, cmap='brg')
 plt.show()
 
-
-def createRandomMatrix(n, m, lower, upper):
-    matrix = []
-    for i in range(n):
-        row = []
-        for j in range(m):
-            row.append(round(np.random.uniform(lower, upper), 2))
-        matrix.append(row)
-    return matrix
-
-
 # fully-connected layer
 class LayerDense:
 
     def __init__(self, n_inputs, n_neurons):
-
-        # self.weights = createRandomMatrix(n_inputs, n_neurons, -0.01, 0.01)  # maybe correct orientation
         self.weights = 0.01 * np.random.randn(n_inputs, n_neurons)
         self.biases = np.zeros((1, n_neurons))
         # self.output = 0
 
-    # forward pass
     def forward(self, inputs):
-
         self.output = np.dot(inputs, self.weights) + self.biases
         # return self.output
 
@@ -40,18 +25,13 @@ class LayerDense:
 # ReLU activation class
 class ActivationReLU:
 
-    # forward pass
     def forward(self, inputs):
-
         self.output = np.maximum(0, inputs)
 
 
 # Softmax activation class
 class ActivationSoftmax:
-
-    # forward pass
     def forward(self, inputs):
-
         exp_values = np.exp(inputs - np.max(inputs, axis=1, keepdims=True))
         probabilities = exp_values / np.sum(exp_values, axis=1, keepdims=True)
         self.output = probabilities
@@ -62,7 +42,6 @@ class Loss:
 
     # calculates losses given outpupt and ground truth values
     def calculate(self, output, y):
-
         sample_losses = self.forward(output, y)
         data_loss = np.mean(sample_losses)
         return data_loss
@@ -70,9 +49,9 @@ class Loss:
 
 # cross-entropy loss
 class LossCategoricalEntropy(Loss):
+
     # forward pass
     def forward(self, y_pred, y_true):
-
         # number of samples in a batch
         samples = len(y_pred)
 
@@ -80,7 +59,6 @@ class LossCategoricalEntropy(Loss):
         # clip both sides to not drag mean to any value
         y_pred_clipped = np.clip(y_pred, 1e-7, 1 - 1e-7)
 
-        # probabilities
         # categorical labels
         if len(y_true.shape) == 1:
             correct_confidences = y_pred_clipped[range(samples), y_true]    # understand this line better
@@ -93,12 +71,15 @@ class LossCategoricalEntropy(Loss):
         return negative_log_likelyhoods
 
 
+# Layer 1
 dense1 = LayerDense(2, 3)
 activation1 = ActivationReLU()
 
+# Layer 2
 dense2 = LayerDense(3, 3)
 activation2 = ActivationSoftmax()
 
+# Loss
 loss_function = LossCategoricalEntropy()
 
 dense1.forward(x)
